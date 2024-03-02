@@ -1,0 +1,12 @@
+.item-task {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ededed;
+    font-size: 24px;
+    padding: 15px 15px 15px 5px;
+    position: relative;
+}
+
+.item-task:hover > span {
+    display: block;
+}
