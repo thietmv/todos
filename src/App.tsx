@@ -36,6 +36,13 @@ function App() {
         }
     }, []);
 
+    useEffect(() => {
+      const tabStorage = JSON.parse(localStorage.getItem('tab'));
+      if (tabStorage) {
+          setTab(tabStorage);
+      }
+  }, []);
+
     return (
         < div
             css={css({
