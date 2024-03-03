@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from "@emotion/styled";
 import {v4 as uuidv4} from "uuid";
 /** @jsxImportSource @emotion/react */
@@ -46,10 +46,17 @@ function AddTask({setListTask}: Props) {
     const [value, setValue] = useState<string>('')
     const [completeAll, setCompleteAll] = useState<boolean>(false)
 
+    useEffect(() => {
+        const completeAllStorage = JSON.parse(localStorage.getItem('completeAll'));
+        if (completeAllStorage) {
+            setCompleteAll(completeAllStorage);
+        }
+    }, []);
+
     const onKeyDown = (e) => {
         if (e.key === 'Enter' && value && value.replace(/\s+/g, "") !== "") {
-            const idItem = uuidv4()
             setListTask(prev => {
+                const idItem = uuidv4()
                 const newListTask = [...prev, {value: value.trim(), id: idItem, isActive: false, isCompleted: false}]
                 localStorage.setItem('listTask', JSON.stringify(newListTask));
                 return newListTask
@@ -65,6 +72,7 @@ function AddTask({setListTask}: Props) {
             localStorage.setItem('listTask', JSON.stringify(newListTask));
             return newListTask
         })
+        localStorage.setItem('completeAll', JSON.stringify(!completeAll));
         setCompleteAll(!completeAll)
     }
     return (
