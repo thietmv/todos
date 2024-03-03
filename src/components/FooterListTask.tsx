@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from "@emotion/styled";
-import {TaskData} from "../App";
 
 type Props = {
     setListTask: (task) => void,
-    listTask: Array<TaskData>,
+    itemLeft: number,
     tab: string,
     setTab: (tab) => void,
 }
@@ -30,7 +29,8 @@ const Button = styled.button`
   &:hover {
     text-decoration: underline;
   }
-  &:focus{
+
+  &:focus {
     outline: none;
   }
 
@@ -54,7 +54,7 @@ const Li = styled.li`
   }
 `
 
-function FooterListTask({listTask, setListTask, tab, setTab}: Props) {
+function FooterListTask({itemLeft, setListTask, tab, setTab}: Props) {
 
     const handleTab = (tab: string) => {
         setTab(tab)
@@ -62,12 +62,15 @@ function FooterListTask({listTask, setListTask, tab, setTab}: Props) {
     }
 
     const handleClearCompleted = () => {
-        setListTask(listTask.filter(i => !i.isCompleted))
-        localStorage.setItem('listTask', JSON.stringify(listTask.filter(i => !i.isCompleted)));
+        setListTask(prev => {
+            const newListTask = prev.filter(i => !i.isCompleted)
+            localStorage.setItem('listTask', JSON.stringify(newListTask));
+            return newListTask
+        })
     }
     return (
         <FooterList>
-            <span>{listTask.filter(i => !i.isCompleted).length} item left!</span>
+            <span>{itemLeft} item left!</span>
             <Ul>
                 <Li active={tab === 'all'} onClick={() => handleTab('all')}>All</Li>
                 <Li active={tab === 'active'} onClick={() => handleTab('active')}>Active</Li>

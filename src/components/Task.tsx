@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import styled from "@emotion/styled";
 import {TaskData} from "../App";
 
 type Props = {
     item: TaskData,
     setListTask: (task) => void,
-    listTask: Array<TaskData>
 }
 const Image = styled.i`
   width: 40px;
@@ -72,61 +71,65 @@ const Input = styled.input`
   }
 `
 
-function Task({item, setListTask, listTask}: Props) {
-    const [isCompleted, setIsCompleted] = useState<boolean>(false)
+function Task({item, setListTask}: Props) {
     const [value, setValue] = useState<string>(item.value)
     const [edit, setEdit] = useState<boolean>(false)
 
-    useEffect(() => {
-        setIsCompleted(item.isCompleted)
-    }, [item.isCompleted])
     const handleCompleted = () => {
-        setIsCompleted(!isCompleted)
-        const newListTask = [...listTask]
-        const idx = newListTask.findIndex((task => task.id === item.id))
-        if (idx !== -1) {
-            newListTask[idx].isCompleted = !newListTask[idx].isCompleted
-        }
-        setListTask(newListTask)
-        localStorage.setItem('listTask', JSON.stringify(newListTask));
+        setListTask(prev => {
+            const newListTask = [...prev]
+            const idx = newListTask.findIndex((task => task.id === item.id))
+            if (idx !== -1) {
+                newListTask[idx] = {...newListTask[idx], isCompleted: !newListTask[idx].isCompleted}
+            }
+            localStorage.setItem('listTask', JSON.stringify(newListTask));
+            return newListTask
+        })
     }
 
     const onUpdateValue = (e) => {
         if (e.key === 'Enter' && value && value.replace(/\s+/g, "") !== "") {
-            const newListTask = [...listTask]
-            const idx = newListTask.findIndex((task => task.id === item.id))
-            if (idx !== -1) {
-                newListTask[idx].value = value
-            }
-            setListTask(newListTask)
-            localStorage.setItem('listTask', JSON.stringify(newListTask));
+
+            setListTask(prev => {
+                const newListTask = [...prev];
+                const idx = newListTask.findIndex((task => task.id === item.id))
+                if (idx !== -1) {
+                    newListTask[idx] ={...newListTask[idx], value: value}
+                }
+                localStorage.setItem('listTask', JSON.stringify(newListTask));
+                return newListTask
+            })
             setEdit(false)
         }
     }
+
     const onDelete = () => {
-        const newListTask = [...listTask]
-        const idx = newListTask.findIndex((task => task.id === item.id))
-        if (idx !== -1) {
-            newListTask.splice(idx, 1)
-        }
-        setListTask(newListTask)
-        localStorage.setItem('listTask', JSON.stringify(newListTask));
-        setEdit(false)
-    }
-    const handleBlur = () => {
-        if (value && value.replace(/\s+/g, "") !== "") {
-            const newListTask = [...listTask]
+        setListTask(prev => {
+            const newListTask = [...prev]
             const idx = newListTask.findIndex((task => task.id === item.id))
             if (idx !== -1) {
-                newListTask[idx].value = value
+                newListTask.splice(idx, 1)
             }
-            setListTask(newListTask)
             localStorage.setItem('listTask', JSON.stringify(newListTask));
-
-        }
+            return newListTask
+        })
         setEdit(false)
     }
 
+    const handleBlur = () => {
+        if (value && value.replace(/\s+/g, "") !== "") {
+            setListTask(prev => {
+                const newListTask = [...prev]
+                const idx = newListTask.findIndex((task => task.id === item.id))
+                if (idx !== -1) {
+                    newListTask[idx].value = value
+                }
+                localStorage.setItem('listTask', JSON.stringify(newListTask));
+                return newListTask
+            })
+        }
+        setEdit(false)
+    }
 
     if (!value)
         return null
@@ -144,7 +147,7 @@ function Task({item, setListTask, listTask}: Props) {
     return (
         <div className={'item-task'}>
             {
-                isCompleted ?
+                item.isCompleted ?
                     <Image onClick={handleCompleted} bg={"./images/task-active.svg"}/>
                     :
                     <Image onClick={handleCompleted} bg={"./images/task-default.svg"}/>
@@ -152,7 +155,7 @@ function Task({item, setListTask, listTask}: Props) {
             <Label
                 onDoubleClick={() => setEdit(true)}
                 onBlur={() => setEdit(true)}
-                isCompleted={isCompleted}>{item.value}</Label>
+                isCompleted={item.isCompleted}>{item.value}</Label>
             <Destroy onClick={onDelete}/>
         </div>
     );

@@ -68,17 +68,17 @@ function App() {
                     boxShadow: "0 2px 4px 0 rgba(0,0,0,.2), 0 25px 50px 0 rgba(0,0,0,.1)",
                 })}
             >
-                <AddTask listTask={listTask} setListTask={setListTask}/>
+                <AddTask setListTask={setListTask}/>
                 {
-                    listTaskShow.length > 0 && listTaskShow.map((item, index) =>
-                        <Task key={index} item={item} listTask={listTask} setListTask={setListTask}/>
+                    listTaskShow.length > 0 && listTaskShow.map((item) =>
+                        <Task key={item.id} item={item} setListTask={setListTask}/>
                     )
                 }
                 {
                     listTask.length > 0 && <FooterListTask
                         tab={tab}
                         setTab={setTab}
-                        listTask={listTask}
+                        itemLeft={listTask.filter(i => !i.isCompleted).length}
                         setListTask={setListTask}/>
                 }
 
