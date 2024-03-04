@@ -3,9 +3,11 @@ import styled from "@emotion/styled";
 import {v4 as uuidv4} from "uuid";
 /** @jsxImportSource @emotion/react */
 import {css} from "@emotion/react";
+import {TaskData} from "../App";
 
 type Props = {
     setListTask: (task) => void,
+    listTask: Array<TaskData>
 }
 const Input = styled.input`
   padding: 16px 16px 16px 60px;
@@ -42,7 +44,7 @@ const Icon = styled.i`
   transform: rotate(90deg);
 `;
 
-function AddTask({setListTask}: Props) {
+function AddTask({listTask,setListTask}: Props) {
     const [value, setValue] = useState<string>('')
     const [completeAll, setCompleteAll] = useState<boolean>(false)
 
@@ -55,12 +57,10 @@ function AddTask({setListTask}: Props) {
 
     const onKeyDown = (e) => {
         if (e.key === 'Enter' && value && value.replace(/\s+/g, "") !== "") {
-            setListTask(prev => {
-                const idItem = uuidv4()
-                const newListTask = [...prev, {value: value.trim(), id: idItem, isActive: false, isCompleted: false}]
+            const idItem = uuidv4()
+            const newListTask = [...listTask, {value: value.trim(), id: idItem, isActive: false, isCompleted: false}]
                 localStorage.setItem('listTask', JSON.stringify(newListTask));
-                return newListTask
-            })
+            setListTask(newListTask)
             setValue('')
         }
     }
